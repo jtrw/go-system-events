@@ -7,14 +7,41 @@ import (
     "github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
+// Manager is used to hold references to all Clients Registered, and Broadcasting etc
+type Manager struct {
+}
+
+// NewManager is used to initalize all the values inside the manager
+func NewManager() *Manager {
+	return &Manager{}
+}
+
+var websocketUpgrader = websocket.Upgrader{
     ReadBufferSize:  1024,
     WriteBufferSize: 1024,
+}
+
+var event string
+
+// serveWS is a HTTP Handler that the has the Manager that allows connections
+func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
+
+	log.Println("New connection")
+	// Begin by upgrading the HTTP request
+	conn, err := websocketUpgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	// We wont do anything yet so close connection again
+	conn.Close()
 }
 
 func homePage(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "Home Page")
 }
+
+
 
 func reader(conn *websocket.Conn) {
     for {
@@ -31,33 +58,15 @@ func reader(conn *websocket.Conn) {
             log.Println(err)
             return
         }
-
     }
 }
 
-func wsEndpoint(w http.ResponseWriter, r *http.Request) {
-    upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-
-    // upgrade this connection to a WebSocket
-    // connection
-    ws, err := upgrader.Upgrade(w, r, nil)
-    if err != nil {
-        log.Println(err)
-    }
-
-    log.Println("Client Connected")
-    err = ws.WriteMessage(1, []byte("Hi Client!"))
-    if err != nil {
-        log.Println(err)
-    }
-    // listen indefinitely for new messages coming
-    // through on our WebSocket connection
-    reader(ws)
-}
 
 func setupRoutes() {
+    manager := NewManager()
+
     http.HandleFunc("/", homePage)
-    http.HandleFunc("/ws", wsEndpoint)
+    http.HandleFunc("/ws", manager.serveWS)
 }
 
 func main() {
