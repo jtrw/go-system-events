@@ -37,6 +37,8 @@ type Client struct {
 
 	// manager is the manager used to manage the client
 	manager *Manager
+	// egress is used to avoid concurrent writes on the WebSocket
+    egress chan []byte
 }
 
 var event string
@@ -45,6 +47,8 @@ var event string
 func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("New connection")
+
+	websocketUpgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	// Begin by upgrading the HTTP request
 	conn, err := websocketUpgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -54,8 +58,71 @@ func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
 	// Create New Client
     client := NewClient(conn, m)
     m.addClient(client)
+    // Start the read / write processes
+    go client.readMessages()
+    // go client.writeMessages()
 	// We wont do anything yet so close connection again
 	//conn.Close()
+}
+
+func (c *Client) readMessages() {
+	defer func() {
+		// Graceful Close the Connection once this
+		// function is done
+		c.manager.removeClient(c)
+	}()
+	// Loop Forever
+	for {
+		// ReadMessage is used to read the next message in queue
+		// in the connection
+		messageType, payload, err := c.connection.ReadMessage()
+
+		if err != nil {
+			// If Connection is closed, we will Recieve an error here
+			// We only want to log Strange errors, but not simple Disconnection
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				log.Printf("error reading message: %v", err)
+			}
+			break // Break the loop to close conn & Cleanup
+		}
+		log.Println("MessageType: ", messageType)
+		log.Println("Payload: ", string(payload))
+
+		// Hack to test that WriteMessages works as intended
+        // Will be replaced soon
+        for wsclient := range c.manager.clients {
+            wsclient.egress <- payload
+        }
+	}
+}
+
+// writeMessages is a process that listens for new messages to output to the Client
+func (c *Client) writeMessages() {
+	defer func() {
+		// Graceful close if this triggers a closing
+		c.manager.removeClient(c)
+	}()
+
+	for {
+		select {
+		case message, ok := <-c.egress:
+			// Ok will be false Incase the egress channel is closed
+			if !ok {
+				// Manager has closed this connection channel, so communicate that to frontend
+				if err := c.connection.WriteMessage(websocket.CloseMessage, nil); err != nil {
+					// Log that the connection is closed and the reason
+					log.Println("connection closed: ", err)
+				}
+				// Return to close the goroutine
+				return
+			}
+			// Write a Regular text message to the connection
+			if err := c.connection.WriteMessage(websocket.TextMessage, message); err != nil {
+				log.Println(err)
+			}
+			log.Println("sent message")
+		}
+	}
 }
 
 // addClient will add clients to our clientList
@@ -87,6 +154,7 @@ func NewClient(conn *websocket.Conn, manager *Manager) *Client {
 	return &Client{
 		connection: conn,
 		manager:    manager,
+		egress:     make(chan []byte),
 	}
 }
 
