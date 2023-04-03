@@ -18,7 +18,7 @@ type Client struct {
 	// manager is the manager used to manage the client
 	manager *Manager
 
-	egress chan []byte
+    egress chan Event
 
 	chatroom string
 }
@@ -37,7 +37,7 @@ func NewClient(conn *websocket.Conn, manager *Manager) *Client {
 	return &Client{
 		connection: conn,
 		manager:    manager,
-		egress:     make(chan []byte),
+		egress:     make(chan Event),
 	}
 }
 
@@ -49,20 +49,19 @@ func (c *Client) readMessages() {
 	}()
 	// Loop Forever
 	for {
-		// ReadMessage is used to read the next message in queue
-		// in the connection
-		messageType, payload, err := c.connection.ReadMessage()
+	// ReadMessage is used to read the next message in queue
+        // in the connection
+        _, payload, err := c.connection.ReadMessage()
 
-		if err != nil {
-			// If Connection is closed, we will Recieve an error here
-			// We only want to log Strange errors, but not simple Disconnection
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error reading message: %v", err)
-			}
-			break // Break the loop to close conn & Cleanup
-		}
-
-		// Marshal incoming data into a Event struct
+        if err != nil {
+            // If Connection is closed, we will Recieve an error here
+            // We only want to log Strange errors, but simple Disconnection
+            if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+                log.Printf("error reading message: %v", err)
+            }
+            break // Break the loop to close conn & Cleanup
+        }
+        // Marshal incoming data into a Event struct
         var request Event
         if err := json.Unmarshal(payload, &request); err != nil {
             log.Printf("error marshalling message: %v", err)
@@ -71,15 +70,6 @@ func (c *Client) readMessages() {
         // Route the Event
         if err := c.manager.routeEvent(request, c); err != nil {
             log.Println("Error handeling Message: ", err)
-        }
-
-		log.Println("MessageType: ", messageType)
-		log.Println("Payload: ", string(payload))
-
-		// Hack to test that WriteMessages works as intended
-        // Will be replaced soon
-        for wsclient := range c.manager.clients {
-            wsclient.egress <- payload
         }
 	}
 }
