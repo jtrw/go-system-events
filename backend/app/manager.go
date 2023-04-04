@@ -81,7 +81,7 @@ func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
 	m.addClient(client)
 
 	 go client.readMessages()
-    // go client.writeMessages()
+     go client.writeMessages()
     // We wont do anything yet so close connection again
     //conn.Close()
 }
