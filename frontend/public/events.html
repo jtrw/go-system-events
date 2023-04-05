@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>WebSocket Events</title>
+</head>
+<body>
+<h2>Events</h2>
+<input id="input" type="text" size="40" />
+<button onclick="send()">Send</button>
+<pre id="output"></pre>
+<script>
+
+    class Event {
+        // Each Event needs a Type
+        // The payload is not required
+        constructor(type, payload) {
+            this.type = type;
+            this.payload = payload;
+        }
+    }
+
+    class NewEvent {
+        constructor(uuid, type, token) {
+            this.uuid = uuid;
+            this.type = type;
+            this.token = token;
+        }
+    }
+
+    function sendEvent(eventName, payload) {
+        // Create a event Object with a event named send_message
+        const event = new Event(eventName, payload);
+        // Format as JSON and send
+        socket.send(JSON.stringify(event));
+    }
+
+    let socket = new WebSocket("ws://127.0.0.1:8080/ws");
+    var input = document.getElementById("input");
+    var output = document.getElementById("output");
+
+    socket.onopen = function () {
+        output.innerHTML += "Status: Connected\n";
+    };
+
+    socket.onmessage = function (e) {
+        output.innerHTML += "\nServer: " + e.data + "\n";
+    };
+
+    function send() {
+        let outgoingEvent = new NewEvent("11-1111-22", "new", "123");
+        sendEvent("send_message", outgoingEvent)
+        //socket.send(input.value);
+        //input.value = "";
+    }
+
+</script>
+</body>
+</html>
