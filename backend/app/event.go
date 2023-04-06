@@ -21,7 +21,7 @@ type EventHandler func(event Event, c *Client) error
 
 const (
 	// EventSendMessage is the event name for new chat messages sent
-	EventSendMessage = "send_message"
+	EventSendMessage = "send"
 	// EventNewMessage is a response to send_message
 	EventNewMessage = "new_message"
 	// EventChangeRoom is event when switching rooms
