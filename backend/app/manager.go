@@ -46,7 +46,6 @@ func NewManager() *Manager {
 // setupEventHandlers configures and adds all handlers
 func (m *Manager) setupEventHandlers() {
     m.handlers[EventSendMessage] = SendMessageHandler
-	m.handlers[EventChangeRoom] = ChatRoomHandler
 }
 
 // routeEvent is used to make sure the correct event goes into the correct handler
@@ -65,7 +64,6 @@ func (m *Manager) routeEvent(event Event, c *Client) error {
 
 // serveWS is a HTTP Handler that the has the Manager that allows connections
 func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
-
 	log.Println("New connection")
 	websocketUpgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	// Begin by upgrading the HTTP request
@@ -80,10 +78,8 @@ func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
 	// Add the newly created client to the manager
 	m.addClient(client)
 
-	 go client.readMessages()
-     go client.writeMessages()
-    // We wont do anything yet so close connection again
-    //conn.Close()
+    go client.readMessages()
+    go client.writeMessages()
 }
 
 // addClient will add clients to our clientList

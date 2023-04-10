@@ -24,8 +24,6 @@ const (
 	EventSendMessage = "send"
 	// EventNewMessage is a response to send_message
 	EventNewMessage = "new_message"
-	// EventChangeRoom is event when switching rooms
-	EventChangeRoom = "change_room"
 )
 
 // SendMessageEvent is the payload sent in the
@@ -67,29 +65,7 @@ func SendMessageHandler(event Event, c *Client) error {
 	outgoingEvent.Type = EventNewMessage
 	// Broadcast to all other Clients
 	for client := range c.manager.clients {
-		// Only send to clients inside the same chatroom
-		if client.chatroom == c.chatroom {
-			client.egress <- outgoingEvent
-		}
-
+	    client.egress <- outgoingEvent
 	}
-	return nil
-}
-
-type ChangeRoomEvent struct {
-	Name string `json:"name"`
-}
-
-// ChatRoomHandler will handle switching of chatrooms between clients
-func ChatRoomHandler(event Event, c *Client) error {
-	// Marshal Payload into wanted format
-	var changeRoomEvent ChangeRoomEvent
-	if err := json.Unmarshal(event.Payload, &changeRoomEvent); err != nil {
-		return fmt.Errorf("bad payload in request: %v", err)
-	}
-
-	// Add Client to chat room
-	c.chatroom = changeRoomEvent.Name
-
 	return nil
 }

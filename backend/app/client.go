@@ -17,7 +17,6 @@ type Client struct {
 	// manager is the manager used to manage the client
 	manager *Manager
     egress chan Event
-	chatroom string
 }
 
 var (
