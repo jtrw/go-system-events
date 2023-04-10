@@ -35,8 +35,7 @@ func (s Server) routes() chi.Router {
     router.Use(middleware.Logger)
 	router.Use(middleware.Throttle(1000), middleware.Timeout(60*time.Second))
 	//router.Use(tollbooth_chi.LimitHandler(tollbooth.NewLimiter(10, nil)))
-
-
+	
 	router.Route("/", func(r chi.Router) {
 	    r.Get("/", s.homePage)
 	    r.Get("/ws", s.serveWS)
