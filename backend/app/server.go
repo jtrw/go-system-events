@@ -36,11 +36,10 @@ func (s Server) routes() chi.Router {
 	router.Use(middleware.Throttle(1000), middleware.Timeout(60*time.Second))
 	//router.Use(tollbooth_chi.LimitHandler(tollbooth.NewLimiter(10, nil)))
 
-    manager := NewManager()
 
 	router.Route("/", func(r chi.Router) {
 	    r.Get("/", s.homePage)
-	    r.Post("/ws", manager.serveWS)
+	    r.Get("/ws", s.serveWS)
 	})
 
     lgr.Printf("[INFO] Activate rest server")
@@ -48,6 +47,11 @@ func (s Server) routes() chi.Router {
     lgr.Printf("[INFO] Port: %s", s.Port)
 
 	return router
+}
+
+func (s Server) serveWS(w http.ResponseWriter, r *http.Request) {
+    manager := NewManager();
+    manager.serveWS(w, r)
 }
 
 func (s Server) homePage(w http.ResponseWriter, r *http.Request) {

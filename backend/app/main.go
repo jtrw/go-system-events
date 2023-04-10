@@ -32,12 +32,7 @@ func main() {
         log.Fatal(err)
     }
 
-
-   // setupRoutes()
-   // log.Fatal(http.ListenAndServe(":8080", nil))
-
-
-     srv := Server {
+    srv := Server {
         Host: opts.Host,
         Port: opts.Port,
         PinSize: 1,
