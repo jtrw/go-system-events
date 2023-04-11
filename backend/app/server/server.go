@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
  "fmt"
@@ -11,6 +11,7 @@ import (
  //"github.com/didip/tollbooth_chi"
  "github.com/go-chi/chi/v5"
  "github.com/go-chi/chi/v5/middleware"
+ manager "github.com/jtrw/go-events/v1/backend/app/websocket"
 )
 
 type Server struct {
@@ -35,7 +36,7 @@ func (s Server) routes() chi.Router {
     router.Use(middleware.Logger)
 	router.Use(middleware.Throttle(1000), middleware.Timeout(60*time.Second))
 	//router.Use(tollbooth_chi.LimitHandler(tollbooth.NewLimiter(10, nil)))
-	
+
 	router.Route("/", func(r chi.Router) {
 	    r.Get("/", s.homePage)
 	    r.Get("/ws", s.serveWS)
@@ -49,8 +50,8 @@ func (s Server) routes() chi.Router {
 }
 
 func (s Server) serveWS(w http.ResponseWriter, r *http.Request) {
-    manager := NewManager();
-    manager.serveWS(w, r)
+    manager := manager.NewManager();
+    manager.ServeWS(w, r)
 }
 
 func (s Server) homePage(w http.ResponseWriter, r *http.Request) {

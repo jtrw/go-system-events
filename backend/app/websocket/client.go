@@ -1,4 +1,4 @@
-package main
+package websocket
 
 import (
     "log"
@@ -117,6 +117,5 @@ func (c *Client) writeMessages() {
                     return // return to break this goroutine triggeing cleanup
                 }
         }
-
 	}
 }

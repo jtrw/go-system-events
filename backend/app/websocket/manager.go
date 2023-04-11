@@ -1,4 +1,4 @@
-package main
+package websocket
 
 import (
 	"log"
@@ -62,8 +62,8 @@ func (m *Manager) routeEvent(event Event, c *Client) error {
 	}
 }
 
-// serveWS is a HTTP Handler that the has the Manager that allows connections
-func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
+// ServeWS is a HTTP Handler that the has the Manager that allows connections
+func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	log.Println("New connection")
 	websocketUpgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	// Begin by upgrading the HTTP request
