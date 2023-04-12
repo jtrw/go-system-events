@@ -63,6 +63,7 @@ func (c *Client) readMessages() {
             log.Printf("error marshalling message: %v", err)
             break // Breaking the connection here might be harsh xD
         }
+        log.Println(string(request.Payload))
         // Route the Event
         if err := c.manager.routeEvent(request, c); err != nil {
             log.Println("Error handeling Message: ", err)
