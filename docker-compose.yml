@@ -1,0 +1,45 @@
+version: "3.7"
+
+services:
+  event_postgres:
+    container_name: event_postgres_db
+    image: postgres:13-alpine
+    networks:
+      - events-backend
+    environment:
+      POSTGRES_USER: "postgres_user"
+      POSTGRES_PASSWORD: "postgres_pass"
+    volumes:
+      - postgres_db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+  golang:
+    container_name: golang
+    build:
+      context: .docker/go
+      dockerfile: Dockerfile
+    networks:
+      - events-backend
+    env_file:
+      - .env
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./cmd/backend:/go/src/cmd/backend
+      - ./:/dist:rw
+    working_dir: /dist
+
+volumes:
+  event_postgres_db:
+
+networks:
+  redirect-backend:
+    name: events-backend
+    driver: bridge
