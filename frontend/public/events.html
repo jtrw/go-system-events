@@ -16,17 +16,18 @@
     class Event {
         // Each Event needs a Type
         // The payload is not required
-        constructor(type, payload) {
+        constructor(type, token, payload) {
             this.type = type;
+            this.token = token;
             this.payload = payload;
         }
     }
 
     class NewEvent {
-        constructor(uuid, type, token) {
+        constructor(uuid, type, status) {
             this.uuid = uuid;
             this.type = type;
-            this.token = token;
+            this.status = status
         }
     }
 
