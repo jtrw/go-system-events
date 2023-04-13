@@ -11,6 +11,7 @@ import (
 type Event struct {
 	// Type is the message type sent
 	Type string `json:"type"`
+	Token string `json:"token"`
 	// Payload is the data Based on the Type
 	Payload json.RawMessage `json:"payload"`
 }
@@ -63,6 +64,7 @@ func SendMessageHandler(event Event, c *Client) error {
 	var outgoingEvent Event
 	outgoingEvent.Payload = data
 	outgoingEvent.Type = EventNewMessage
+	outgoingEvent.Token = event.Token
 	// Broadcast to all other Clients
 	for client := range c.manager.clients {
 	    client.egress <- outgoingEvent
