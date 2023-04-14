@@ -6,9 +6,8 @@ services:
     image: postgres:13-alpine
     networks:
       - events-backend
-    environment:
-      POSTGRES_USER: "postgres_user"
-      POSTGRES_PASSWORD: "postgres_pass"
+    env_file:
+      - .env
     volumes:
       - postgres_db:/var/lib/postgresql/data
     ports:
