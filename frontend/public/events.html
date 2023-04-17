@@ -31,9 +31,10 @@
         }
     }
 
-    function sendEvent(eventName, payload) {
+    function sendEvent(eventName, token, payload) {
         // Create a event Object with a event named send_message
-        const event = new Event(eventName, payload);
+
+        const event = new Event(eventName, token, payload);
         // Format as JSON and send
         socket.send(JSON.stringify(event));
     }
@@ -52,7 +53,7 @@
 
     function send() {
         let outgoingEvent = new NewEvent("11-1111-22", "new", "123");
-        sendEvent("send", outgoingEvent)
+        sendEvent("send", '123', outgoingEvent)
         //socket.send(input.value);
         //input.value = "";
     }
