@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     volumes:
-      - postgres_db:/var/lib/postgresql/data
+      - event_postgres_db:/var/lib/postgresql/data
     ports:
       - 5432:5432
     healthcheck:
@@ -39,6 +39,6 @@ volumes:
   event_postgres_db:
 
 networks:
-  redirect-backend:
+  events-backend:
     name: events-backend
     driver: bridge
