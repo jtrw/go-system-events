@@ -19,9 +19,10 @@ services:
       retries: 3
   golang:
     container_name: golang
-    build:
-      context: .docker/go
-      dockerfile: Dockerfile
+    build: .
+#    build:
+#      context: .docker/go
+#      dockerfile: Dockerfile
     networks:
       - events-backend
     env_file:

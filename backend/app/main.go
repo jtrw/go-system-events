@@ -8,7 +8,7 @@ import (
 )
 
 type Options struct {
-   Host string `short:"h" long:"host" default:"127.0.0.1" description:"Host web server"`
+   Host string `short:"h" long:"host" default:"localhost" description:"Host web server"`
    Port string `short:"p" long:"port" default:"3000" description:"Port web server"`
 }
 
