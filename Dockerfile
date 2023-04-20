@@ -29,6 +29,6 @@ COPY --from=backend /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=backend /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=backend /go-events /srv/go-events
 
-EXPOSE 8080
+EXPOSE 3000
 WORKDIR /srv
 ENTRYPOINT ["/srv/go-events"]
