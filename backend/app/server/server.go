@@ -24,7 +24,7 @@ type Server struct {
 }
 
 func (s Server) Run() error {
-	if err := http.ListenAndServe(s.Host+":"+s.Port, s.routes()); err != http.ErrServerClosed {
+	if err := http.ListenAndServe(":"+s.Port, s.routes()); err != http.ErrServerClosed {
 		return errors.Wrap(err, "server failed")
 	}
 	return nil

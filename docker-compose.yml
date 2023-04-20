@@ -4,8 +4,8 @@ services:
   event_postgres:
     container_name: event_postgres_db
     image: postgres:13-alpine
-    networks:
-      - events-backend
+#    networks:
+#      - events-backend
     env_file:
       - .env
     volumes:
@@ -23,23 +23,23 @@ services:
 #    build:
 #      context: .docker/go
 #      dockerfile: Dockerfile
-    networks:
-      - events-backend
+#    networks:
+#      - events-backend
     env_file:
       - .env
-    expose:
-      - "3000"
+    #expose:
+    #  - "3000"
     ports:
       - "3000:3000"
-    volumes:
-      - ./cmd/backend:/go/src/cmd/backend
-      - ./:/dist:rw
-    working_dir: /dist
+    #volumes:
+    #  - ./cmd/backend:/go/src/cmd/backend
+    #  - ./:/dist:rw
+    #working_dir: /dist
 
 volumes:
   event_postgres_db:
 
-networks:
-  events-backend:
-    name: events-backend
-    driver: bridge
+#networks:
+#  events-backend:
+#    name: events-backend
+#    driver: bridge
