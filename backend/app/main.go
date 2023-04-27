@@ -8,8 +8,7 @@ import (
 )
 
 type Options struct {
-   Host string `short:"h" long:"host" default:"localhost" description:"Host web server"`
-   Port string `short:"p" long:"port" default:"3000" description:"Port web server"`
+   Listen string `short:"l" long:"listen" default:"0.0.0.0:3000" description:"Default 0.0.0.0:3000 for localhost"`
 }
 
 func main() {
@@ -21,8 +20,7 @@ func main() {
     }
 
     srv := server.Server {
-        Host: opts.Host,
-        Port: opts.Port,
+        Listen: opts.Listen,
         PinSize: 1,
         WebRoot: "/",
         Version: "1.0",
@@ -31,8 +29,4 @@ func main() {
     if err := srv.Run(); err != nil {
         log.Printf("[ERROR] failed, %+v", err)
     }
-
-    log.Printf("[INFO] Activate rest server")
-    log.Printf("[INFO] Host: %s", opts.Host)
-    log.Printf("[INFO] Port: %s", opts.Port)
 }

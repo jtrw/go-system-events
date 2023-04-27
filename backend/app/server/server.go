@@ -15,8 +15,7 @@ import (
 )
 
 type Server struct {
-    Host           string
-    Port           string
+    Listen         string
 	PinSize        int
 	MaxPinAttempts int
 	WebRoot        string
@@ -24,7 +23,7 @@ type Server struct {
 }
 
 func (s Server) Run() error {
-	if err := http.ListenAndServe(":"+s.Port, s.routes()); err != http.ErrServerClosed {
+	if err := http.ListenAndServe(s.Listen, s.routes()); err != http.ErrServerClosed {
 		return errors.Wrap(err, "server failed")
 	}
 	return nil
@@ -43,8 +42,7 @@ func (s Server) routes() chi.Router {
 	})
 
     lgr.Printf("[INFO] Activate rest server")
-    lgr.Printf("[INFO] Host: %s", s.Host)
-    lgr.Printf("[INFO] Port: %s", s.Port)
+    lgr.Printf("[INFO] Listen: %s", s.Listen)
 
 	return router
 }
